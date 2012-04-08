@@ -25,11 +25,13 @@ class AutoCompleteSelectWidget(forms.widgets.TextInput):
                  channel,
                  help_text='',
                  show_help_text=False,
+                 add_link=True,
                  *args, **kw):
         super(forms.widgets.TextInput, self).__init__(*args, **kw)
         self.channel = channel
         self.help_text = help_text
         self.show_help_text = show_help_text
+        self.add_link = add_link
 
     def render(self, name, value, attrs=None):
 
@@ -67,8 +69,10 @@ class AutoCompleteSelectWidget(forms.widgets.TextInput):
                 'add_link' : self.add_link,
                 }
         context.update(bootstrap())
-        
-        return mark_safe(render_to_string(('autocompleteselect_%s.html' % self.channel, 'autocompleteselect.html'),context))
+
+        output = [render_to_string(('autocompleteselect_%s.html' % self.channel, 'autocompleteselect.html'),context)]
+
+        return mark_safe(''.join(output))
 
     def value_from_datadict(self, data, files, name):
 
@@ -91,12 +95,13 @@ class AutoCompleteSelectField(forms.fields.CharField):
 
     def __init__(self, channel, *args, **kwargs):
         self.channel = channel
-        widget = kwargs.get("widget", False)
-        
+        widget = kwargs.get('widget', False)
+        add_link = kwargs.pop('add_link', True)
+		
         if not widget or not isinstance(widget, AutoCompleteSelectWidget):
             help_text = kwargs.get('help_text',_('Enter text to search.'))
             show_help_text = kwargs.pop('show_help_text',False)
-            kwargs["widget"] = AutoCompleteSelectWidget(channel=channel,help_text=help_text,show_help_text=show_help_text)
+            kwargs['widget'] = AutoCompleteSelectWidget(channel=channel,help_text=help_text,show_help_text=show_help_text,add_link=add_link)
         super(AutoCompleteSelectField, self).__init__(max_length=255,*args, **kwargs)
 
     def clean(self, value):
@@ -131,12 +136,14 @@ class AutoCompleteSelectMultipleWidget(forms.widgets.SelectMultiple):
                  channel,
                  help_text='',
                  show_help_text=False,
+                 add_link=True,
                  *args, **kwargs):
         super(AutoCompleteSelectMultipleWidget, self).__init__(*args, **kwargs)
         self.channel = channel
         
         self.help_text = help_text or _('Enter text to search.')
         self.show_help_text = show_help_text
+        self.add_link = add_link
 
     def render(self, name, value, attrs=None):
 
@@ -183,7 +190,9 @@ class AutoCompleteSelectMultipleWidget(forms.widgets.SelectMultiple):
         }
         context.update(bootstrap())
 
-        return mark_safe(render_to_string(('autocompleteselectmultiple_%s.html' % self.channel, 'autocompleteselectmultiple.html'),context))
+        output = [render_to_string(('autocompleteselectmultiple_%s.html' % self.channel, 'autocompleteselectmultiple.html'),context)]
+
+        return mark_safe(''.join(output))
 
     def value_from_datadict(self, data, files, name):
         # eg. u'members': [u'|229|4688|190|']
@@ -226,8 +235,9 @@ class AutoCompleteSelectMultipleField(forms.fields.CharField):
         # admin will also show help text, so by default do not show it in widget
         # if using in a normal form then set to True so the widget shows help
         show_help_text = kwargs.pop('show_help_text',False)
-        
-        kwargs['widget'] = AutoCompleteSelectMultipleWidget(channel=channel,help_text=help_text,show_help_text=show_help_text)
+        add_link = kwargs.pop('add_link',True)
+		
+        kwargs['widget'] = AutoCompleteSelectMultipleWidget(channel=channel,help_text=help_text,show_help_text=show_help_text,add_link=add_link)
         kwargs['help_text'] = help_text
         
         super(AutoCompleteSelectMultipleField, self).__init__(*args, **kwargs)
