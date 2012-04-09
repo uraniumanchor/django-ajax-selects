@@ -25,7 +25,7 @@ class AutoCompleteSelectWidget(forms.widgets.TextInput):
                  channel,
                  help_text='',
                  show_help_text=False,
-                 add_link=True,
+                 add_link=None,
                  *args, **kw):
         super(forms.widgets.TextInput, self).__init__(*args, **kw)
         self.channel = channel
@@ -96,7 +96,7 @@ class AutoCompleteSelectField(forms.fields.CharField):
     def __init__(self, channel, *args, **kwargs):
         self.channel = channel
         widget = kwargs.get('widget', False)
-        add_link = kwargs.pop('add_link', True)
+        add_link = kwargs.pop('add_link', None)
 		
         if not widget or not isinstance(widget, AutoCompleteSelectWidget):
             help_text = kwargs.get('help_text',_('Enter text to search.'))
@@ -136,7 +136,7 @@ class AutoCompleteSelectMultipleWidget(forms.widgets.SelectMultiple):
                  channel,
                  help_text='',
                  show_help_text=False,
-                 add_link=True,
+                 add_link=None,
                  *args, **kwargs):
         super(AutoCompleteSelectMultipleWidget, self).__init__(*args, **kwargs)
         self.channel = channel
@@ -235,7 +235,7 @@ class AutoCompleteSelectMultipleField(forms.fields.CharField):
         # admin will also show help text, so by default do not show it in widget
         # if using in a normal form then set to True so the widget shows help
         show_help_text = kwargs.pop('show_help_text',False)
-        add_link = kwargs.pop('add_link',True)
+        add_link = kwargs.pop('add_link',None)
 		
         kwargs['widget'] = AutoCompleteSelectMultipleWidget(channel=channel,help_text=help_text,show_help_text=show_help_text,add_link=add_link)
         kwargs['help_text'] = help_text
