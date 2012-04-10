@@ -31,6 +31,7 @@ $.fn.autocompleteselect = function(options) {
 				kill();
 			}
 			$this.val(ui.item.pk);
+			$this.change();
 			$text.val('');
 			addKiller(ui.item.repr);
 			$deck.trigger("added");
