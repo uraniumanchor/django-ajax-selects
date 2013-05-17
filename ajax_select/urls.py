@@ -1,6 +1,4 @@
-
-from django.conf.urls.defaults import *
-
+from django.conf.urls import *
 
 urlpatterns = patterns('',
     url(r'^ajax_lookup/(?P<channel>[-\w]+)$',
