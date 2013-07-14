@@ -1,3 +1,15 @@
+if (typeof jQuery == 'undefined') {
+	try { // use django admins
+		jQuery=django.jQuery;
+		console.log("Using django jQuery");
+	} catch(err) {
+		document.write('<script type="text/javascript"  src="//ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"><\/script>');
+	}
+}
+if(typeof jQuery == 'undefined' || (typeof jQuery.ui == 'undefined')) {
+	document.write('<script type="text/javascript"  src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"><\/script>');
+	document.write('<link type="text/css" rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/smoothness/jquery-ui.css" />');
+}
 
 if(typeof jQuery.fn.autocompletehtml != 'function') {
 
@@ -22,7 +34,7 @@ $.fn.autocompleteselect = function(options) {
 	return this.each(function() {
 		var id = this.id;
 		var $this = $(this);
-	
+
 		var $text = $("#"+id+"_text");
 		var $deck = $("#"+id+"_on_deck");
 
@@ -58,11 +70,11 @@ $.fn.autocompleteselect = function(options) {
 			$this.val('');
 			$deck.children().fadeOut(1.0).remove();
 		}
-		
+
 		options.select = receiveResult;
 		$text.autocomplete(options);
 		$text.autocompletehtml();
-		
+
 		if (options.initial) {
 			its = options.initial;
 			addKiller(its[0], its[1]);
@@ -86,7 +98,7 @@ $.fn.autocompleteselectmultiple = function(options) {
 		function receiveResult(event, ui) {
 			pk = ui.item.pk;
 			prev = $this.val();
-			
+
 			if (prev.indexOf("|"+pk+"|") == -1) {
 				$this.val((prev ? prev : "|") + pk + "|");
 				addKiller(ui.item.repr, pk);
@@ -116,7 +128,7 @@ $.fn.autocompleteselectmultiple = function(options) {
 		options.select = receiveResult;
 		$text.autocomplete(options);
 		$text.autocompletehtml();
-		
+
 		if (options.initial) {
 			$.each(options.initial, function(i, its) {
 				addKiller(its[0], its[1]);
