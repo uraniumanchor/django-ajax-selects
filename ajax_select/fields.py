@@ -30,12 +30,14 @@ class AutoCompleteSelectWidget(forms.widgets.TextInput):
                  help_text='',
                  show_help_text=False,
                  add_link=None,
+                 is_admin=False,
                  *args, **kw):
         super(forms.widgets.TextInput, self).__init__(*args, **kw)
         self.channel = channel
         self.help_text = help_text
         self.show_help_text = show_help_text
         self.add_link = add_link
+        self.is_admin = is_admin;
 
     def render(self, name, value, attrs=None):
 
@@ -51,6 +53,11 @@ class AutoCompleteSelectWidget(forms.widgets.TextInput):
             except IndexError:
                 raise Exception("%s cannot find object:%s" % (lookup, value))
             display = lookup.format_item_display(obj)
+            if self.is_admin:
+              change_url = reverse(
+                "admin:%s_%s_change" % (obj._meta.app_label, obj._meta.object_name.lower()),
+                args=(obj.pk,), current_app=obj._meta.app_label)
+              display = '<strong><a href="%s">%s</a></strong>' % (change_url, display)
             current_repr = mark_safe( """new Array("%s",%s)""" % (escapejs(display),obj.pk) )
         else:
             current_repr = 'null'
@@ -101,11 +108,13 @@ class AutoCompleteSelectField(forms.fields.CharField):
         self.channel = channel
         widget = kwargs.get('widget', False)
         add_link = kwargs.pop('add_link', None)
-
+        is_admin = kwargs.pop('is_admin', False);
+        # TODO: add a kwarg for defining whether this is an admin widget, such that we can turn on/off the edit link set-up
+        
         if not widget or not isinstance(widget, AutoCompleteSelectWidget):
             help_text = kwargs.get('help_text',_('Enter text to search.'))
             show_help_text = kwargs.pop('show_help_text',False)
-            kwargs['widget'] = AutoCompleteSelectWidget(channel=channel,help_text=help_text,show_help_text=show_help_text,add_link=add_link)
+            kwargs['widget'] = AutoCompleteSelectWidget(channel=channel,help_text=help_text,show_help_text=show_help_text,add_link=add_link,is_admin=is_admin)
         super(AutoCompleteSelectField, self).__init__(max_length=255,*args, **kwargs)
 
     def clean(self, value):
@@ -145,6 +154,7 @@ class AutoCompleteSelectMultipleWidget(forms.widgets.SelectMultiple):
                  help_text='',
                  show_help_text=False,
                  add_link=None,
+                 is_admin=False,
                  *args, **kwargs):
         super(AutoCompleteSelectMultipleWidget, self).__init__(*args, **kwargs)
         self.channel = channel
@@ -152,6 +162,7 @@ class AutoCompleteSelectMultipleWidget(forms.widgets.SelectMultiple):
         self.help_text = help_text or _('Enter text to search.')
         self.show_help_text = show_help_text
         self.add_link = add_link
+        self.is_admin = is_admin;
 
     def render(self, name, value, attrs=None):
 
@@ -175,6 +186,11 @@ class AutoCompleteSelectMultipleWidget(forms.widgets.SelectMultiple):
         current_repr_json = []
         for obj in objects:
             display = lookup.format_item_display(obj)
+            if self.is_admin:
+              change_url = reverse(
+                "admin:%s_%s_change" % (obj._meta.app_label, obj._meta.object_name.lower()),
+                args=(obj.pk,), current_app=obj._meta.app_label)
+              display = '<strong><a href="%s">%s</a></strong>' % (change_url, display)
             current_repr_json.append( """new Array("%s",%s)""" % (escapejs(display),obj.pk) )
         current_reprs = mark_safe("new Array(%s)" % ",".join(current_repr_json))
 
@@ -222,6 +238,7 @@ class AutoCompleteSelectMultipleField(forms.fields.CharField):
 
         as_default_help = u'Enter text to search.'
         help_text = kwargs.get('help_text')
+        is_admin = kwargs.pop('is_admin', False);
         if not (help_text is None):
             try:
                 en_help = help_text.translate('en')
@@ -245,7 +262,7 @@ class AutoCompleteSelectMultipleField(forms.fields.CharField):
         show_help_text = kwargs.pop('show_help_text',False)
         add_link = kwargs.pop('add_link',None)
 
-        kwargs['widget'] = AutoCompleteSelectMultipleWidget(channel=channel,help_text=help_text,show_help_text=show_help_text,add_link=add_link)
+        kwargs['widget'] = AutoCompleteSelectMultipleWidget(channel=channel,help_text=help_text,show_help_text=show_help_text,add_link=add_link,is_admin=is_admin)
         kwargs['help_text'] = help_text
 
         super(AutoCompleteSelectMultipleField, self).__init__(*args, **kwargs)
