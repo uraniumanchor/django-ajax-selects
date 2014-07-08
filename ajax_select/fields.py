@@ -146,7 +146,7 @@ class AutoCompleteSelectMultipleWidget(forms.widgets.SelectMultiple):
     add_link = None
 
     class Media:
-        js = ['admin/js/jquery.min.js','js/ajax_select.js']
+        js = [settings.STATIC_URL + 'admin/js/jquery.min.js','js/ajax_select.js']
         css = {'ajax': ['css/ajax_select.css']}
 
     def __init__(self,
