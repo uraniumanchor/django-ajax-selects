@@ -105,7 +105,7 @@ class AutoCompleteSelectWidget(forms.widgets.TextInput):
 
         got = data.get(name, None)
         if got:
-            return _to_number(got)
+            return _to_number(got) if got.isnumeric() else got
         else:
             return None
 
@@ -132,6 +132,9 @@ class AutoCompleteSelectField(forms.fields.CharField):
             )
             kwargs["widget"] = AutoCompleteSelectWidget(**widget_kwargs)
         super(AutoCompleteSelectField, self).__init__(max_length=255, *args, **kwargs)
+
+    def to_python(self, value):
+        return _to_number(value) if not isinstance(value, basestring) or value.isnumeric() else value
 
     def clean(self, value):
         if value:
@@ -172,7 +175,6 @@ class AutoCompleteSelectMultipleWidget(forms.widgets.SelectMultiple):
                  **kwargs):
         super(AutoCompleteSelectMultipleWidget, self).__init__(*args, **kwargs)
         self.channel = channel
-
         self.help_text = help_text
         self.show_help_text = show_help_text
         self.plugin_options = plugin_options
@@ -289,6 +291,9 @@ class AutoCompleteSelectMultipleField(forms.fields.CharField):
         if IS_PYTHON2:
             return type(help_text) == unicode
         return type(help_text) == str
+
+    def to_python(self, value):
+	    return [_to_number(v) if not isinstance(v, basestring) or v.isnumeric() else v for v in value]
 
     def clean(self, value):
         if not value and self.required:
