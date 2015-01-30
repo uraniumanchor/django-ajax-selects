@@ -111,16 +111,23 @@ class AutoCompleteSelectWidget(forms.widgets.TextInput):
         return mark_safe(out)
 
     def value_from_datadict(self, data, files, name):
+<<<<<<< 72ed661ee66773ec37012987c04e222ca2ff58ea
 <<<<<<< daab5531b4a1abe37144bd89b8535979834a75ad
 
         got = data.get(name, None)
+=======
+        got = _as_pk(data.get(name, None))
+>>>>>>> Fix various issues with converting incoming form data to something Django wants (especially spurious "this field was modified" checks)
         if got:
             return _to_number(got) if got.isnumeric() else got
         else:
             return None
+<<<<<<< 72ed661ee66773ec37012987c04e222ca2ff58ea
 =======
         return _as_pk(data.get(name, None))
 >>>>>>> better fix for UUID issue reported by @dbinetti
+=======
+>>>>>>> Fix various issues with converting incoming form data to something Django wants (especially spurious "this field was modified" checks)
 
     def id_for_label(self, id_):
         return '%s_text' % id_
@@ -147,7 +154,11 @@ class AutoCompleteSelectField(forms.fields.CharField):
         super(AutoCompleteSelectField, self).__init__(max_length=255, *args, **kwargs)
 
     def to_python(self, value):
+<<<<<<< 72ed661ee66773ec37012987c04e222ca2ff58ea
         return _to_number(value) if (value is not None and (not isinstance(value, basestring) or value.isnumeric())) else value
+=======
+        return _to_number(value) if not isinstance(value, basestring) or value.isnumeric() else value
+>>>>>>> Fix various issues with converting incoming form data to something Django wants (especially spurious "this field was modified" checks)
 
     def clean(self, value):
         if value:
