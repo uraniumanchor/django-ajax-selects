@@ -59,7 +59,7 @@ class AutoCompleteSelectWidget(forms.widgets.TextInput):
                  *args,
                  **kwargs):
         self.plugin_options = plugin_options
-        super(forms.widgets.TextInput, self).__init__(*args, **kwargs)
+        super(AutoCompleteSelectWidget, self).__init__(*args, **kwargs)
         self.channel = channel
         self.help_text = help_text
         self.show_help_text = show_help_text
