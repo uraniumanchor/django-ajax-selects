@@ -134,7 +134,7 @@ class AutoCompleteSelectField(forms.fields.CharField):
         super(AutoCompleteSelectField, self).__init__(max_length=255, *args, **kwargs)
 
     def to_python(self, value):
-        return _to_number(value) if not isinstance(value, basestring) or value.isnumeric() else value
+        return _to_number(value) if (value is not None and (not isinstance(value, basestring) or value.isnumeric())) else value
 
     def clean(self, value):
         if value:
@@ -293,7 +293,7 @@ class AutoCompleteSelectMultipleField(forms.fields.CharField):
         return type(help_text) == str
 
     def to_python(self, value):
-	    return [_to_number(v) if not isinstance(v, basestring) or v.isnumeric() else v for v in value]
+	    return [_to_number(v) if not isinstance(v, basestring) or v.isnumeric() else v for v in value] if value else ''
 
     def clean(self, value):
         if not value and self.required:
