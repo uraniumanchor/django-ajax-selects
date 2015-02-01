@@ -283,6 +283,7 @@ class AutoCompleteSelectMultipleField(forms.fields.CharField):
         }
         kwargs['widget'] = AutoCompleteSelectMultipleWidget(**widget_kwargs)
         kwargs['help_text'] = help_text
+        kwargs['initial'] = kwargs.get('initial',[]) or []
 
         super(AutoCompleteSelectMultipleField, self).__init__(*args, **kwargs)
 
@@ -293,7 +294,7 @@ class AutoCompleteSelectMultipleField(forms.fields.CharField):
         return type(help_text) == str
 
     def to_python(self, value):
-	    return [_to_number(v) if not isinstance(v, basestring) or v.isnumeric() else v for v in value] if value else ''
+	    return [_to_number(v) if not isinstance(v, basestring) or v.isnumeric() else v for v in value] if value is not None else ''
 
     def clean(self, value):
         if not value and self.required:
