@@ -189,13 +189,6 @@ class AutoCompleteSelectMultipleWidget(forms.widgets.SelectMultiple):
 
         lookup = get_lookup(self.channel)
 
-        # eg. value = [3002L, 1194L]
-        if value:
-            # |pk|pk| of current
-            current_ids = "|" + "|".join(str(pk) for pk in value) + "|"
-        else:
-            current_ids = "|"
-
         objects = lookup.get_objects(value)
 
         # text repr of currently selected items
@@ -213,7 +206,6 @@ class AutoCompleteSelectMultipleWidget(forms.widgets.SelectMultiple):
             'name': name,
             'html_id': self.html_id,
             'current': value,
-            'current_ids': current_ids,
             'current_reprs': mark_safe(json.dumps(initial)),
             'help_text': help_text,
             'extra_attrs': mark_safe(flatatt(final_attrs)),
@@ -223,10 +215,6 @@ class AutoCompleteSelectMultipleWidget(forms.widgets.SelectMultiple):
         context.update(plugin_options(lookup, self.channel, self.plugin_options, initial))
 
         return mark_safe(render_to_string(('autocompleteselectmultiple_%s.html' % self.channel, 'autocompleteselectmultiple.html'), context))
-
-    def value_from_datadict(self, data, files, name):
-        # eg. 'members': ['|229|4688|190|']
-        return [_to_number(val) for val in data.get(name, '').split('|') if val]
 
     def id_for_label(self, id_):
         return '%s_text' % id_

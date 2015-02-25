@@ -57,27 +57,37 @@
 
   $.fn.autocompleteselectmultiple = function (options) {
     return this.each(function () {
-      var id = this.id,
+      var id = this.id.slice(0, -2),
           $this = $(this),
-          $text = $('#' + id+'_text'),
-          $deck = $('#' + id+'_on_deck');
+          $text = $('#' + id + '_text'),
+          $deck = $('#' + id + '_on_deck');
 
       function receiveResult(event, ui) {
-        var pk = ui.item.pk,
-            prev = $this.val();
+        var pk = ui.item.pk;
 
-        if (prev.indexOf('|'+pk+'|') === -1) {
-          $this.val((prev ? prev : '|') + pk + '|');
+        if (!$("[id|=" + id + "][value=" + pk + "][type=hidden]").length) {
+          var item = $this.clone();
+          var remove = [];
+          item.attr('name', item.attr('data-name'));
+          item.removeAttr('data-name');
+          item.removeAttr('data-ajax-select');
+          item.removeAttr('data-plugin-options');
+          var i = 0;
+          while ($("#" + id + "-" + i).length != 0) { i++; }
+          item.attr('id', id + "-" + i);
+          item.val(pk);
+          $this.after(item);
           addKiller(ui.item.repr, pk);
           $text.val('');
           $deck.trigger('added', [ui.item.pk, ui.item]);
           $this.trigger('change');
         }
+
         return false;
       }
 
       function addKiller(repr, pk) {
-        var killer_id = 'kill_' + pk + id,
+        var killer_id = 'kill_' + pk + '_' + id,
             killButton = '<span class="ui-icon ui-icon-trash" id="' + killer_id + '">X</span> ';
         $deck.append('<div id="' + id + '_on_deck_' + pk + '">' + killButton + repr + ' </div>');
 
@@ -88,7 +98,12 @@
       }
 
       function kill(pk) {
-        $this.val($this.val().replace('|' + pk + '|', '|'));
+        var selector = "[id|=" + id + "][value=" + pk + "][type=hidden]"
+        if ($(selector + "[data-ajax-select=autocompleteselectmultiple]").length) {
+          $this.removeAttr('value');
+        } else {
+          $(selector).remove();
+        }
         $('#' + id+'_on_deck_'+pk).fadeOut().remove();
       }
 
