@@ -27,10 +27,13 @@ as_default_help = 'Enter text to search.'
 IS_PYTHON2 = sys.version_info[0] == 2
 
 
-def _to_number(got):
-    if IS_PYTHON2:
-        return long(got)
-    return int(got)
+def _as_pk(got):
+    # a unicode method that checks for integers
+    if got.isnumeric():
+        if IS_PYTHON2:
+            return long(got)
+        return int(got)
+    return got
 
 
 def _media(self):
@@ -108,12 +111,16 @@ class AutoCompleteSelectWidget(forms.widgets.TextInput):
         return mark_safe(out)
 
     def value_from_datadict(self, data, files, name):
+<<<<<<< daab5531b4a1abe37144bd89b8535979834a75ad
 
         got = data.get(name, None)
         if got:
             return _to_number(got) if got.isnumeric() else got
         else:
             return None
+=======
+        return _as_pk(data.get(name, None))
+>>>>>>> better fix for UUID issue reported by @dbinetti
 
     def id_for_label(self, id_):
         return '%s_text' % id_
@@ -223,6 +230,10 @@ class AutoCompleteSelectMultipleWidget(forms.widgets.SelectMultiple):
             ('autocompleteselectmultiple_%s.html' % self.channel, 'autocompleteselectmultiple.html'),
             context)
         return mark_safe(out)
+
+    def value_from_datadict(self, data, files, name):
+        # eg. 'members': ['|229|4688|190|']
+        return [_as_pk(val) for val in data.get(name, '').split('|') if val]
 
     def id_for_label(self, id_):
         return '%s_text' % id_
