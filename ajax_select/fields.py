@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 import sys
-from ajax_select import get_lookup
+
 from django import forms
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -11,6 +11,9 @@ from django.template.defaultfilters import force_escape
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
+
+from ajax_select import get_lookup
+
 try:
     import json
 except ImportError:

@@ -1,8 +1,9 @@
-
-from ajax_select import get_lookup
 from django.contrib.admin import site
 from django.db import models
 from django.http import HttpResponse
+
+from ajax_select import get_lookup
+
 try:
     import json
 except ImportError:
